@@ -1,7 +1,5 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 // Rate limiting store (in production, use Redis or similar)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const rateLimitStore = new Map();
 
 // Rate limiting configuration
 const RATE_LIMIT = {
@@ -9,32 +7,16 @@ const RATE_LIMIT = {
   WINDOW_MS: 60 * 1000, // 1 minute window
 };
 
-interface SocraticRequest {
-  question: string;
-  subject?: string;
-  grade?: string;
-}
-
-interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
-    };
-  }>;
-}
-
-function getClientIP(req: VercelRequest): string {
+function getClientIP(req) {
   return (
-    req.headers['x-forwarded-for'] as string ||
-    req.headers['x-real-ip'] as string ||
+    req.headers['x-forwarded-for'] ||
+    req.headers['x-real-ip'] ||
     req.connection?.remoteAddress ||
     'unknown'
   );
 }
 
-function checkRateLimit(clientIP: string): { allowed: boolean; remaining: number } {
+function checkRateLimit(clientIP) {
   const now = Date.now();
   const record = rateLimitStore.get(clientIP);
 
@@ -55,7 +37,7 @@ function checkRateLimit(clientIP: string): { allowed: boolean; remaining: number
   return { allowed: true, remaining: RATE_LIMIT.MAX_REQUESTS - record.count };
 }
 
-function createSocraticPrompt(request: SocraticRequest): string {
+function createSocraticPrompt(request) {
   const { question, subject = 'general', grade = 'high school' } = request;
   
   return `You are a Socratic tutor helping a ${grade} student with ${subject}. 
@@ -74,10 +56,7 @@ Please respond in the following format:
 Keep your response encouraging, clear, and focused on helping them develop their own understanding. Don't give away the answer directly.`;
 }
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -96,7 +75,7 @@ export default async function handler(
     }
 
     // Validate request body
-    const { question, subject, grade }: SocraticRequest = req.body;
+    const { question, subject, grade } = req.body;
 
     if (!question || typeof question !== 'string' || question.trim().length === 0) {
       return res.status(400).json({ error: 'Question is required' });
@@ -149,7 +128,7 @@ export default async function handler(
       return res.status(500).json({ error: 'AI service temporarily unavailable' });
     }
 
-    const geminiData: GeminiResponse = await geminiResponse.json();
+    const geminiData = await geminiResponse.json();
     
     if (!geminiData.candidates || geminiData.candidates.length === 0) {
       return res.status(500).json({ error: 'No response from AI service' });
