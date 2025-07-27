@@ -1,40 +1,12 @@
-// Rate limiting store (in production, use Redis or similar)
-const rateLimitStore = new Map();
-
-// Rate limiting configuration
-const RATE_LIMIT = {
-  MAX_REQUESTS: 10, // 10 requests per window
-  WINDOW_MS: 60 * 1000, // 1 minute window
-};
-
-function getClientIP(req) {
-  return (
-    req.headers['x-forwarded-for'] ||
-    req.headers['x-real-ip'] ||
-    req.connection?.remoteAddress ||
-    'unknown'
-  );
-}
-
-function checkRateLimit(clientIP) {
-  const now = Date.now();
-  const record = rateLimitStore.get(clientIP);
-
-  if (!record || now > record.resetTime) {
-    // First request or window expired
-    rateLimitStore.set(clientIP, {
-      count: 1,
-      resetTime: now + RATE_LIMIT.WINDOW_MS,
-    });
-    return { allowed: true, remaining: RATE_LIMIT.MAX_REQUESTS - 1 };
-  }
-
-  if (record.count >= RATE_LIMIT.MAX_REQUESTS) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  record.count++;
-  return { allowed: true, remaining: RATE_LIMIT.MAX_REQUESTS - record.count };
+// Content moderation - check for inappropriate content
+function isInappropriateContent(text) {
+  const inappropriateWords = [
+    // Add any specific words you want to filter
+    // This is a basic example - you might want to use a more sophisticated content moderation service
+  ];
+  
+  const lowerText = text.toLowerCase();
+  return inappropriateWords.some(word => lowerText.includes(word));
 }
 
 function createSocraticPrompt(request) {
@@ -68,17 +40,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Rate limiting
-    const clientIP = getClientIP(req);
-    const rateLimit = checkRateLimit(clientIP);
-    
-    if (!rateLimit.allowed) {
-      return res.status(429).json({
-        error: 'Rate limit exceeded. Please try again later.',
-        remaining: rateLimit.remaining,
-      });
-    }
-
     // Validate request body
     const { question, subject, grade, conversationHistory = [] } = req.body;
 
@@ -88,6 +49,11 @@ export default async function handler(req, res) {
 
     if (question.length > 1000) {
       return res.status(400).json({ error: 'Question too long (max 1000 characters)' });
+    }
+
+    // Content moderation
+    if (isInappropriateContent(question)) {
+      return res.status(400).json({ error: 'Please keep your questions appropriate and educational.' });
     }
 
     // Get Gemini API key
@@ -145,7 +111,6 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       response: aiResponse,
-      remaining: rateLimit.remaining,
     });
 
   } catch (error) {

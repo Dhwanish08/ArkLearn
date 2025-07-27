@@ -8,6 +8,11 @@ import DailyTasksCard from "@/components/dashboard/DailyTasksCard";
 import AIToolsPanel from "@/components/dashboard/AIToolsPanel";
 import StatsOverview from "@/components/dashboard/StatsOverview";
 import SubjectsPanel from "@/components/dashboard/SubjectsPanel";
+import StudyPlanner from "@/components/dashboard/StudyPlanner";
+import Flashcards from "@/components/dashboard/Flashcards";
+import ProgressReports from "@/components/dashboard/ProgressReports";
+import DailyTasks from "@/components/dashboard/DailyTasks";
+import PomodoroTimer from "@/components/dashboard/PomodoroTimer";
 
 function getFakeTimetable(user): Array<{
   id: string;
@@ -143,6 +148,140 @@ const StudentDashboard = () => {
     }
   };
 
+  // Render the appropriate component based on active page
+  const renderActivePage = () => {
+    switch (activePage) {
+      case "home":
+        return (
+          <>
+            {/* Welcome Section */}
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold gradient-text mb-2">
+                Welcome back, {userName}! 👋
+              </h1>
+              <p className="text-muted-foreground">
+                Here's what's happening in your learning journey today.
+              </p>
+            </div>
+            {/* Stats Overview */}
+            <StatsOverview userRole={userRole} />
+            {/* Subjects Section */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">Subjects</h2>
+              <SubjectsPanel classId={user.class} />
+            </div>
+            {/* Main Dashboard Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+              {/* Left Column - Timetable */}
+              <div className="lg:col-span-1 flex flex-col">
+                <TimetableCard 
+                  userRole={userRole} 
+                  entries={timetableData} 
+                />
+              </div>
+              {/* Middle Column - Daily Tasks (wider) */}
+              <div className="lg:col-span-2 flex flex-col">
+                <DailyTasksCard
+                  userRole={userRole}
+                  tasks={tasksData}
+                  completionRate={taskCompletionRate}
+                  onTaskStatusChange={handleTaskStatusChange}
+                  onAddTask={handleAddTask}
+                />
+              </div>
+            </div>
+            {/* AI Learning Tools - full width below */}
+            <div className="mt-2">
+              <AIToolsPanel onToolClick={handleAIToolClick} />
+            </div>
+            {/* Additional Widgets */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Quick Actions Card */}
+              <div className="p-6 rounded-xl gradient-card shadow-elegant hover-lift">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <span className="text-lg">⚡</span>
+                  Quick Actions
+                </h3>
+                <div className="space-y-2">
+                  <button className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm">
+                    📝 Start Study Session
+                  </button>
+                  <button className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm">
+                    📚 Review Flashcards
+                  </button>
+                  <button className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm">
+                    🎯 Check Progress
+                  </button>
+                </div>
+              </div>
+              {/* Upcoming Deadlines */}
+              <div className="p-6 rounded-xl gradient-card shadow-elegant hover-lift">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <span className="text-lg">⏰</span>
+                  Upcoming Deadlines
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Chemistry Lab Report</span>
+                    <span className="text-orange-500">Tomorrow</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Math Quiz</span>
+                    <span className="text-yellow-500">2 days</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>English Essay</span>
+                    <span className="text-green-500">1 week</span>
+                  </div>
+                </div>
+              </div>
+              {/* Achievement Badge */}
+              <div className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-purple-500/10 border border-accent/20 hover-lift">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <span className="text-lg">🏆</span>
+                  Latest Achievement
+                </h3>
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-accent to-purple-500 flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">🔥</span>
+                  </div>
+                  <h4 className="font-medium text-accent">Week Streak Master</h4>
+                  <p className="text-sm text-muted-foreground">7 consecutive days of study</p>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      case "study-planner":
+        return <StudyPlanner />;
+      case "flashcards":
+        return <Flashcards />;
+      case "progress":
+        return <ProgressReports />;
+      case "tasks":
+        return <DailyTasks />;
+      case "pomodoro":
+        return <PomodoroTimer />;
+      case "ai-tools":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold gradient-text mb-2">AI Learning Tools</h1>
+              <p className="text-muted-foreground">Explore AI-powered learning assistance</p>
+            </div>
+            <AIToolsPanel onToolClick={handleAIToolClick} />
+          </div>
+        );
+      default:
+        return (
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold mb-2">Page Not Found</h2>
+            <p className="text-muted-foreground">The requested page is not available.</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-slate-50 flex">
       {/* Sidebar */}
@@ -162,102 +301,7 @@ const StudentDashboard = () => {
         />
         {/* Dashboard Content */}
         <main className="flex-1 p-6 space-y-6 animate-fade-in">
-          {/* Welcome Section */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold gradient-text mb-2">
-              Welcome back, {userName}! 👋
-            </h1>
-            <p className="text-muted-foreground">
-              Here's what's happening in your learning journey today.
-            </p>
-          </div>
-          {/* Stats Overview */}
-          <StatsOverview userRole={userRole} />
-          {/* Subjects Section */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Subjects</h2>
-            <SubjectsPanel classId={user.class} />
-          </div>
-          {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-            {/* Left Column - Timetable */}
-            <div className="lg:col-span-1 flex flex-col">
-              <TimetableCard 
-                userRole={userRole} 
-                entries={timetableData} 
-              />
-            </div>
-            {/* Middle Column - Daily Tasks (wider) */}
-            <div className="lg:col-span-2 flex flex-col">
-              <DailyTasksCard
-                userRole={userRole}
-                tasks={tasksData}
-                completionRate={taskCompletionRate}
-                onTaskStatusChange={handleTaskStatusChange}
-                onAddTask={handleAddTask}
-              />
-            </div>
-          </div>
-          {/* AI Learning Tools - full width below */}
-          <div className="mt-2">
-            <AIToolsPanel onToolClick={handleAIToolClick} />
-          </div>
-          {/* Additional Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Quick Actions Card */}
-            <div className="p-6 rounded-xl gradient-card shadow-elegant hover-lift">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <span className="text-lg">⚡</span>
-                Quick Actions
-              </h3>
-              <div className="space-y-2">
-                <button className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm">
-                  📝 Start Study Session
-                </button>
-                <button className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm">
-                  📚 Review Flashcards
-                </button>
-                <button className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm">
-                  🎯 Check Progress
-                </button>
-              </div>
-            </div>
-            {/* Upcoming Deadlines */}
-            <div className="p-6 rounded-xl gradient-card shadow-elegant hover-lift">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <span className="text-lg">⏰</span>
-                Upcoming Deadlines
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span>Chemistry Lab Report</span>
-                  <span className="text-orange-500">Tomorrow</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span>Math Quiz</span>
-                  <span className="text-yellow-500">2 days</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span>English Essay</span>
-                  <span className="text-green-500">1 week</span>
-                </div>
-              </div>
-            </div>
-            {/* Achievement Badge */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-purple-500/10 border border-accent/20 hover-lift">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <span className="text-lg">🏆</span>
-                Latest Achievement
-              </h3>
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-accent to-purple-500 flex items-center justify-center shadow-lg">
-                  <span className="text-2xl">🔥</span>
-                </div>
-                <h4 className="font-medium text-accent">Week Streak Master</h4>
-                <p className="text-sm text-muted-foreground">7 consecutive days of study</p>
-              </div>
-            </div>
-          </div>
+          {renderActivePage()}
         </main>
       </div>
     </div>

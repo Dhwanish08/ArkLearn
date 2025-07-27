@@ -38,8 +38,6 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
   const [subject, setSubject] = useState("General");
   const [grade, setGrade] = useState("High School");
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState("");
-  const [remainingRequests, setRemainingRequests] = useState<number | null>(null);
   const [conversationHistory, setConversationHistory] = useState<Array<{type: 'student' | 'tutor', message: string}>>([]);
   const [isConversationMode, setIsConversationMode] = useState(false);
 
@@ -53,7 +51,6 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
 
     const studentMessage = question.trim();
     setLoading(true);
-    setResponse("");
 
     // Add student message to conversation
     const newHistory = [...conversationHistory, { type: 'student' as const, message: studentMessage }];
@@ -76,17 +73,11 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
       const data = await res.json();
 
       if (!res.ok) {
-        if (res.status === 429) {
-          toast.error(`Rate limit exceeded. Please wait before trying again.`);
-        } else {
-          toast.error(data.error || "Failed to get response");
-        }
+        toast.error(data.error || "Failed to get response");
         return;
       }
 
       const tutorMessage = data.response;
-      setResponse(tutorMessage);
-      setRemainingRequests(data.remaining);
       
       // Add tutor response to conversation
       setConversationHistory([...newHistory, { type: 'tutor' as const, message: tutorMessage }]);
@@ -104,8 +95,6 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
 
   const handleReset = () => {
     setQuestion("");
-    setResponse("");
-    setRemainingRequests(null);
     setConversationHistory([]);
     setIsConversationMode(false);
   };
@@ -190,55 +179,58 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                 )}
               </Button>
               
-              {response && (
+              {conversationHistory.length > 0 && (
                 <Button type="button" variant="outline" onClick={handleReset}>
                   Start New Conversation
                 </Button>
               )}
             </div>
 
-            {remainingRequests !== null && (
-              <div className="text-xs text-muted-foreground">
-                Requests remaining: {remainingRequests}
-              </div>
-            )}
           </form>
 
-          {/* Response Display */}
-          {response && (
+          {/* Chat Interface */}
+          {conversationHistory.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-blue-500" />
-                <h3 className="font-semibold">Socratic Guidance</h3>
+                <h3 className="font-semibold">Conversation</h3>
               </div>
               
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                <div className="prose prose-sm max-w-none">
-                  {response.split('\n').map((line, index) => {
-                    // Handle numbered sections (1. Acknowledging their question warmly)
-                    if (/^\d+\.\s+[A-Za-z\s]+:/.test(line)) {
-                      return (
-                        <h4 key={index} className="text-base font-semibold mt-4 mb-2 text-blue-600">
-                          {line}
-                        </h4>
-                      );
-                    }
-                    // Handle bullet points
-                    if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
-                      return (
-                        <li key={index} className="ml-4 mb-1">
-                          {line.trim().substring(1).trim()}
-                        </li>
-                      );
-                    }
-                    // Regular paragraphs
-                    if (line.trim()) {
-                      return <p key={index} className="mb-3 leading-relaxed">{line}</p>;
-                    }
-                    // Empty lines
-                    return <br key={index} />;
-                  })}
-                </div>
+              {/* Chat Messages */}
+              <div className="max-h-96 overflow-y-auto space-y-3 p-4 bg-gray-50 rounded-lg">
+                {conversationHistory.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${message.type === 'student' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] p-3 rounded-lg ${
+                        message.type === 'student'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-white border border-gray-200'
+                      }`}
+                    >
+                      <div className="text-sm">
+                        {message.message.split('\n').map((line, lineIndex) => (
+                          <p key={lineIndex} className="mb-2 last:mb-0">
+                            {line}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {loading && (
+                  <div className="flex justify-start">
+                    <div className="bg-white border border-gray-200 p-3 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span className="text-sm text-gray-600">Tutor is thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="text-xs text-muted-foreground bg-green-50 p-3 rounded-lg border border-green-200">
