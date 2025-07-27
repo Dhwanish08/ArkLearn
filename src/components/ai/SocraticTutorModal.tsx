@@ -199,14 +199,28 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
               <div className="p-4 bg-muted/50 rounded-lg border">
                 <div className="prose prose-sm max-w-none">
                   {response.split('\n').map((line, index) => {
-                    if (line.startsWith('**') && line.endsWith('**')) {
+                    // Handle numbered sections (1. Understanding the Question:)
+                    if (/^\d+\.\s+[A-Za-z\s]+:/.test(line)) {
                       return (
                         <h4 key={index} className="text-base font-semibold mt-4 mb-2 text-blue-600">
-                          {line.replace(/\*\*/g, '')}
+                          {line}
                         </h4>
                       );
                     }
-                    return <p key={index} className="mb-2">{line}</p>;
+                    // Handle bullet points
+                    if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+                      return (
+                        <li key={index} className="ml-4 mb-1">
+                          {line.trim().substring(1).trim()}
+                        </li>
+                      );
+                    }
+                    // Regular paragraphs
+                    if (line.trim()) {
+                      return <p key={index} className="mb-2">{line}</p>;
+                    }
+                    // Empty lines
+                    return <br key={index} />;
                   })}
                 </div>
               </div>

@@ -48,10 +48,10 @@ Student's question: "${question}"
 
 Please respond in the following format:
 
-1. **Understanding the Question**: Briefly acknowledge what they're asking
-2. **Guiding Questions**: Ask 2-3 thoughtful questions that will help them think through this step by step
-3. **Key Concepts**: Mention 1-2 important concepts they should consider
-4. **Next Steps**: Suggest what they should try or think about next
+1. Understanding the Question: Briefly acknowledge what they're asking
+2. Guiding Questions: Ask 2-3 thoughtful questions that will help them think through this step by step
+3. Key Concepts: Mention 1-2 important concepts they should consider
+4. Next Steps: Suggest what they should try or think about next
 
 Keep your response encouraging, clear, and focused on helping them develop their own understanding. Don't give away the answer directly.`;
 }
