@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Bot, MessageCircle, Brain, FileText, Zap, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import SocraticTutorModal from "@/components/ai/SocraticTutorModal";
 
 interface AITool {
   id: string;
@@ -18,6 +20,8 @@ interface AIToolsPanelProps {
 }
 
 const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
+  const [socraticModalOpen, setSocraticModalOpen] = useState(false);
+
   const aiTools: AITool[] = [
     {
       id: "socratic-tutor",
@@ -80,7 +84,13 @@ const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
             <Button
               key={tool.id}
               variant="outline"
-              onClick={() => onToolClick(tool.id)}
+              onClick={() => {
+                if (tool.id === "socratic-tutor") {
+                  setSocraticModalOpen(true);
+                } else {
+                  onToolClick(tool.id);
+                }
+              }}
               className="h-auto p-4 justify-start hover-lift group relative overflow-hidden"
             >
               {/* Gradient Background */}
@@ -122,6 +132,12 @@ const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
           </p>
         </div>
       </CardContent>
+      
+      {/* Socratic Tutor Modal */}
+      <SocraticTutorModal 
+        open={socraticModalOpen} 
+        onOpenChange={setSocraticModalOpen} 
+      />
     </Card>
   );
 };
