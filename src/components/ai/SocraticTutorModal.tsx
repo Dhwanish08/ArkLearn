@@ -196,10 +196,10 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                 <h3 className="font-semibold">Socratic Guidance</h3>
               </div>
               
-              <div className="p-4 bg-muted/50 rounded-lg border">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
                 <div className="prose prose-sm max-w-none">
                   {response.split('\n').map((line, index) => {
-                    // Handle numbered sections (1. Understanding the Question:)
+                    // Handle numbered sections (1. Acknowledging their question warmly)
                     if (/^\d+\.\s+[A-Za-z\s]+:/.test(line)) {
                       return (
                         <h4 key={index} className="text-base font-semibold mt-4 mb-2 text-blue-600">
@@ -217,7 +217,7 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                     }
                     // Regular paragraphs
                     if (line.trim()) {
-                      return <p key={index} className="mb-2">{line}</p>;
+                      return <p key={index} className="mb-3 leading-relaxed">{line}</p>;
                     }
                     // Empty lines
                     return <br key={index} />;
@@ -225,9 +225,9 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                 </div>
               </div>
 
-              <div className="text-xs text-muted-foreground bg-blue-50 p-3 rounded-lg border border-blue-200">
-                <strong>💡 Tip:</strong> The Socratic method helps you think critically and discover answers yourself. 
-                Try to answer the guiding questions before asking for more help!
+              <div className="text-xs text-muted-foreground bg-green-50 p-3 rounded-lg border border-green-200">
+                <strong>💡 Tip:</strong> This is a conversational tutor! Feel free to ask follow-up questions or ask for clarification. 
+                The tutor will guide you step by step to discover answers yourself.
               </div>
             </div>
           )}

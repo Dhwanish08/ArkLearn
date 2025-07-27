@@ -40,20 +40,26 @@ function checkRateLimit(clientIP) {
 function createSocraticPrompt(request) {
   const { question, subject = 'general', grade = 'high school' } = request;
   
-  return `You are a Socratic tutor helping a ${grade} student with ${subject}. 
+  return `You are a warm, encouraging Socratic tutor having a one-on-one conversation with a ${grade} student about ${subject}. 
 
-Your role is to guide the student to discover the answer themselves through thoughtful questioning, not to give direct answers.
+Your teaching style:
+- Be conversational and friendly, like a caring teacher
+- Ask thoughtful questions that guide the student to discover answers themselves
+- Provide gentle explanations and encouragement
+- Use examples and analogies when helpful
+- Keep the tone encouraging and supportive
 
 Student's question: "${question}"
 
-Please respond in the following format:
+Respond as if you're having a natural conversation. Start by acknowledging their question warmly, then guide them with questions and gentle explanations. Be conversational, not formal. Use phrases like "That's a great question!" or "Let me help you think through this..." 
 
-1. Understanding the Question: Briefly acknowledge what they're asking
-2. Guiding Questions: Ask 2-3 thoughtful questions that will help them think through this step by step
-3. Key Concepts: Mention 1-2 important concepts they should consider
-4. Next Steps: Suggest what they should try or think about next
+Focus on:
+1. Acknowledging their question warmly
+2. Asking 2-3 guiding questions that help them think
+3. Providing gentle explanations and examples
+4. Encouraging them to explore further
 
-Keep your response encouraging, clear, and focused on helping them develop their own understanding. Don't give away the answer directly.`;
+Keep it conversational and encouraging!`;
 }
 
 export default async function handler(req, res) {
