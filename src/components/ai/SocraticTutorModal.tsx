@@ -40,6 +40,8 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const [remainingRequests, setRemainingRequests] = useState<number | null>(null);
+  const [conversationHistory, setConversationHistory] = useState<Array<{type: 'student' | 'tutor', message: string}>>([]);
+  const [isConversationMode, setIsConversationMode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +51,13 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
       return;
     }
 
+    const studentMessage = question.trim();
     setLoading(true);
     setResponse("");
+
+    // Add student message to conversation
+    const newHistory = [...conversationHistory, { type: 'student' as const, message: studentMessage }];
+    setConversationHistory(newHistory);
 
     try {
       const res = await fetch("/api/ai/socratic-tutor", {
@@ -59,9 +66,10 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          question: question.trim(),
+          question: studentMessage,
           subject,
           grade,
+          conversationHistory: newHistory.slice(-4), // Send last 4 messages for context
         }),
       });
 
@@ -76,8 +84,14 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
         return;
       }
 
-      setResponse(data.response);
+      const tutorMessage = data.response;
+      setResponse(tutorMessage);
       setRemainingRequests(data.remaining);
+      
+      // Add tutor response to conversation
+      setConversationHistory([...newHistory, { type: 'tutor' as const, message: tutorMessage }]);
+      setIsConversationMode(true);
+      
       toast.success("Got your Socratic guidance!");
       
     } catch (error) {
@@ -92,6 +106,8 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
     setQuestion("");
     setResponse("");
     setRemainingRequests(null);
+    setConversationHistory([]);
+    setIsConversationMode(false);
   };
 
   return (
@@ -169,14 +185,14 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Get Socratic Guidance
+                    {isConversationMode ? "Continue Conversation" : "Get Socratic Guidance"}
                   </>
                 )}
               </Button>
               
               {response && (
                 <Button type="button" variant="outline" onClick={handleReset}>
-                  Ask New Question
+                  Start New Conversation
                 </Button>
               )}
             </div>
