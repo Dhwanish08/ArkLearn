@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/ai/socratic-tutor.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite"
