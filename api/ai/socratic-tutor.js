@@ -10,7 +10,30 @@ function isInappropriateContent(text) {
 }
 
 function createSocraticPrompt(request) {
-  const { question, subject = 'general', grade = 'high school', conversationHistory = [] } = request;
+  const { question, subject = 'general', grade = 'high school', chapter = '', textbookContext = '', language = 'en', conversationHistory = [] } = request;
+  
+  let contextPrompt = '';
+  
+  // Add textbook chapter context if provided
+  if (chapter) {
+    contextPrompt += `\n\nTEXTBOOK CHAPTER CONTEXT: The student is currently studying ${chapter}. Please tailor your response to align with this specific chapter's content and learning objectives.`;
+  }
+  
+  // Add uploaded textbook content if provided
+  if (textbookContext) {
+    contextPrompt += `\n\nTEXTBOOK CONTENT REFERENCE:\n${textbookContext.substring(0, 1500)}\n\nUse this textbook content as a reference to provide accurate, curriculum-aligned guidance.`;
+  }
+  
+  // Add language instruction
+  const languageNames = {
+    'en': 'English',
+    'gu': 'Gujarati',
+    'hi': 'Hindi',
+    'sa': 'Sanskrit'
+  };
+  
+  const targetLanguage = languageNames[language] || 'English';
+  contextPrompt += `\n\nLANGUAGE INSTRUCTION: Respond in ${targetLanguage}. If the student asks in a different language, you may respond in that language, but primarily use ${targetLanguage} for explanations and guidance.`;
   
   return `You are a warm, encouraging Socratic tutor having a one-on-one conversation with a ${grade} student about ${subject}. 
 
@@ -20,6 +43,10 @@ Your teaching style:
 - Provide gentle explanations and encouragement
 - Use examples and analogies when helpful
 - Keep the tone encouraging and supportive
+- If textbook context is provided, reference it appropriately to ensure accuracy
+- Adapt your language complexity to the student's grade level
+
+${contextPrompt}
 
 ${conversationHistory.length > 0 ? `Previous conversation context:
 ${conversationHistory.map(msg => `${msg.type === 'student' ? 'Student' : 'Tutor'}: ${msg.message}`).join('\n')}
@@ -41,7 +68,7 @@ export default async function handler(req, res) {
 
   try {
     // Validate request body
-    const { question, subject, grade, conversationHistory = [] } = req.body;
+    const { question, subject, grade, chapter, textbookContext, language, conversationHistory = [] } = req.body;
 
     if (!question || typeof question !== 'string' || question.trim().length === 0) {
       return res.status(400).json({ error: 'Question is required' });
@@ -64,7 +91,7 @@ export default async function handler(req, res) {
     }
 
     // Create the prompt
-    const prompt = createSocraticPrompt({ question, subject, grade, conversationHistory });
+    const prompt = createSocraticPrompt({ question, subject, grade, chapter, textbookContext, language, conversationHistory });
 
     // Call Gemini API
     const geminiResponse = await fetch(

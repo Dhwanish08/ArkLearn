@@ -12,6 +12,7 @@ import { collection, getCountFromServer, query, where } from "firebase/firestore
 import UserManagementPanel from "@/components/dashboard/UserManagementPanel";
 import ManageUsers from "@/components/dashboard/ManageUsers";
 import SchoolSettings from "@/components/dashboard/SchoolSettings";
+import TimetableManagementPage from "./TimetableManagementPage";
 import { useUser } from "@/context/UserContext";
 
 const AdminDashboard = () => {
@@ -135,6 +136,41 @@ const AdminDashboard = () => {
                 </div>
               </Card>
             </div>
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+              <Card className="p-6 gradient-card hover-lift cursor-pointer" onClick={() => setActivePage("manage-users")}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold mb-2">User Management</h3>
+                    <p className="text-sm text-muted-foreground">Manage students, teachers, and admins</p>
+                  </div>
+                  <Users className="w-8 h-8 text-primary" />
+                </div>
+              </Card>
+              
+              <Card className="p-6 gradient-card hover-lift cursor-pointer" onClick={() => setActivePage("timetable-management")}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold mb-2">Timetable Management</h3>
+                    <p className="text-sm text-muted-foreground">Create and edit class schedules</p>
+                  </div>
+                  <Calendar className="w-8 h-8 text-primary" />
+                </div>
+              </Card>
+              
+              {userRole === "Main Admin" && (
+                <Card className="p-6 gradient-card hover-lift cursor-pointer" onClick={() => setActivePage("school-settings")}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold mb-2">School Settings</h3>
+                      <p className="text-sm text-muted-foreground">Configure school-wide settings</p>
+                    </div>
+                    <GraduationCap className="w-8 h-8 text-primary" />
+                  </div>
+                </Card>
+              )}
+            </div>
+
             {/* User Management Panel */}
             <div className="my-8">
               <UserManagementPanel userRole={userRole} />
@@ -143,6 +179,8 @@ const AdminDashboard = () => {
         );
       case "manage-users":
         return <ManageUsers />;
+      case "timetable-management":
+        return <TimetableManagementPage />;
       case "school-settings":
         return <SchoolSettings />;
       default:

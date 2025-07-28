@@ -12,6 +12,7 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import NotFound from "./pages/NotFound";
 import { UserProvider } from "@/context/UserContext";
 import AdminUserManagement from "./pages/AdminUserManagement";
+import TimetableManagementPage from "./pages/TimetableManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/dev-seed-data" element={<DevSeedDataPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/admin-users" element={<AdminUserManagement />} />
+            <Route path="/timetable-management" element={<TimetableManagementPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

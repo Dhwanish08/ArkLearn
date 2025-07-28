@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Bot, MessageCircle, Brain, FileText, Zap, Sparkles } from "lucide-react";
+import { Bot, MessageCircle, Brain, FileText, Zap, Sparkles, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SocraticTutorModal from "@/components/ai/SocraticTutorModal";
+import TextbookLearningAssistant from "@/components/ai/TextbookLearningAssistant";
 
 interface AITool {
   id: string;
@@ -21,6 +22,7 @@ interface AIToolsPanelProps {
 
 const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
   const [socraticModalOpen, setSocraticModalOpen] = useState(false);
+  const [textbookModalOpen, setTextbookModalOpen] = useState(false);
 
   const aiTools: AITool[] = [
     {
@@ -64,6 +66,15 @@ const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
       category: "Planning",
       isPopular: true,
       gradient: "from-indigo-500 to-purple-500"
+    },
+    {
+      id: "textbook-assistant",
+      name: "Textbook Assistant",
+      description: "AI-powered textbook analysis and learning tools",
+      icon: BookOpen,
+      category: "Learning",
+      isPopular: true,
+      gradient: "from-teal-500 to-cyan-500"
     }
   ];
 
@@ -87,6 +98,8 @@ const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
               onClick={() => {
                 if (tool.id === "socratic-tutor") {
                   setSocraticModalOpen(true);
+                } else if (tool.id === "textbook-assistant") {
+                  setTextbookModalOpen(true);
                 } else {
                   onToolClick(tool.id);
                 }
@@ -128,7 +141,7 @@ const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
             <span className="text-sm font-medium text-accent">AI Tip</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            Ask specific questions to get better results. Example: "Explain photosynthesis step by step" instead of just "photosynthesis"
+            💡 Upload textbook chapters for context-aware tutoring. Choose your preferred language for personalized learning experience. Use the Textbook Assistant for comprehensive content analysis.
           </p>
         </div>
       </CardContent>
@@ -137,6 +150,12 @@ const AIToolsPanel = ({ onToolClick }: AIToolsPanelProps) => {
       <SocraticTutorModal 
         open={socraticModalOpen} 
         onOpenChange={setSocraticModalOpen} 
+      />
+      
+      {/* Textbook Learning Assistant Modal */}
+      <TextbookLearningAssistant 
+        open={textbookModalOpen} 
+        onOpenChange={setTextbookModalOpen} 
       />
     </Card>
   );

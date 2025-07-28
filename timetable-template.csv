@@ -1,0 +1,51 @@
+Day,Subject,Teacher,StartTime,EndTime,Room,Type
+Monday,Mathematics,Dr. Sarah Johnson,08:00,09:00,Room 201,subject
+Monday,,,09:00,09:20,,break
+Monday,Physics,Prof. Michael Chen,09:20,10:20,Lab 1,subject
+Monday,Chemistry,Dr. Emily Davis,10:20,11:20,Lab 2,subject
+Monday,English,Ms. Rachel Green,11:20,12:20,Room 202,subject
+Monday,,,12:20,13:20,,lunch
+Monday,Biology,Mr. John Smith,13:20,14:20,Room 203,subject
+Monday,,,14:20,14:40,,break
+Monday,Computer Science,Ms. Priya Patel,14:40,15:40,Computer Lab,subject
+Monday,History,Mr. David Lee,15:40,16:40,Room 101,subject
+Tuesday,Mathematics,Dr. Sarah Johnson,08:00,09:00,Room 201,subject
+Tuesday,,,09:00,09:20,,break
+Tuesday,Physics,Prof. Michael Chen,09:20,10:20,Lab 1,subject
+Tuesday,Chemistry,Dr. Emily Davis,10:20,11:20,Lab 2,subject
+Tuesday,English,Ms. Rachel Green,11:20,12:20,Room 202,subject
+Tuesday,,,12:20,13:20,,lunch
+Tuesday,Biology,Mr. John Smith,13:20,14:20,Room 203,subject
+Tuesday,,,14:20,14:40,,break
+Tuesday,Computer Science,Ms. Priya Patel,14:40,15:40,Computer Lab,subject
+Tuesday,Geography,Mr. David Lee,15:40,16:40,Room 101,subject
+Wednesday,Mathematics,Dr. Sarah Johnson,08:00,09:00,Room 201,subject
+Wednesday,,,09:00,09:20,,break
+Wednesday,Physics,Prof. Michael Chen,09:20,10:20,Lab 1,subject
+Wednesday,Chemistry,Dr. Emily Davis,10:20,11:20,Lab 2,subject
+Wednesday,English,Ms. Rachel Green,11:20,12:20,Room 202,subject
+Wednesday,,,12:20,13:20,,lunch
+Wednesday,Biology,Mr. John Smith,13:20,14:20,Room 203,subject
+Wednesday,,,14:20,14:40,,break
+Wednesday,Computer Science,Ms. Priya Patel,14:40,15:40,Computer Lab,subject
+Wednesday,Economics,Mr. David Lee,15:40,16:40,Room 101,subject
+Thursday,Mathematics,Dr. Sarah Johnson,08:00,09:00,Room 201,subject
+Thursday,,,09:00,09:20,,break
+Thursday,Physics,Prof. Michael Chen,09:20,10:20,Lab 1,subject
+Thursday,Chemistry,Dr. Emily Davis,10:20,11:20,Lab 2,subject
+Thursday,English,Ms. Rachel Green,11:20,12:20,Room 202,subject
+Thursday,,,12:20,13:20,,lunch
+Thursday,Biology,Mr. John Smith,13:20,14:20,Room 203,subject
+Thursday,,,14:20,14:40,,break
+Thursday,Computer Science,Ms. Priya Patel,14:40,15:40,Computer Lab,subject
+Thursday,Business Studies,Mr. David Lee,15:40,16:40,Room 101,subject
+Friday,Mathematics,Dr. Sarah Johnson,08:00,09:00,Room 201,subject
+Friday,,,09:00,09:20,,break
+Friday,Physics,Prof. Michael Chen,09:20,10:20,Lab 1,subject
+Friday,Chemistry,Dr. Emily Davis,10:20,11:20,Lab 2,subject
+Friday,English,Ms. Rachel Green,11:20,12:20,Room 202,subject
+Friday,,,12:20,13:20,,lunch
+Friday,Biology,Mr. John Smith,13:20,14:20,Room 203,subject
+Friday,,,14:20,14:40,,break
+Friday,Computer Science,Ms. Priya Patel,14:40,15:40,Computer Lab,subject
+Friday,Accountancy,Mr. David Lee,15:40,16:40,Room 101,subject 

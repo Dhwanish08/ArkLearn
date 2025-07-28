@@ -53,6 +53,7 @@ const Sidebar = ({ userRole, activePage, onPageChange }: SidebarProps) => {
 
   const adminMenuItems: MenuItem[] = [
     { id: "manage-users", label: "Manage Users", icon: Users },
+    { id: "timetable-management", label: "Timetable Management", icon: Calendar },
   ];
 
   const mainAdminMenuItems: MenuItem[] = [
