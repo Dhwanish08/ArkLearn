@@ -81,7 +81,18 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, user.email, values.password);
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
-      setError(err.message || "Login failed. Please try again.");
+      console.error("Login detail error:", err);
+      let errorMessage = "Login failed. Please try again.";
+
+      if (err.message?.includes("authenticationservice.signinwithpassword-are-blocked")) {
+        errorMessage = "Identity Toolkit API is blocked. Please check your Google Cloud Console API Key restrictions.";
+      } else if (err.code === "auth/invalid-api-key") {
+        errorMessage = "Invalid Firebase API Key. Please check your .env file.";
+      } else if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        errorMessage = "Invalid email or password.";
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
