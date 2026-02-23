@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, BookOpen, FileText, Brain, Sparkles, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSelector from "./LanguageSelector";
+import { callTextbookAssistant } from "@/lib/ai-service";
 
 interface TextbookLearningAssistantProps {
   open: boolean;
@@ -55,31 +56,18 @@ export default function TextbookLearningAssistant({ open, onOpenChange }: Textbo
     setResult("");
 
     try {
-      const res = await fetch("/api/ai/textbook-assistant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: textbookContent,
-          mode: selectedMode,
-          language: selectedLanguage,
-        }),
+      const result = await callTextbookAssistant({
+        content: textbookContent,
+        mode: selectedMode,
+        language: selectedLanguage,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Failed to generate content");
-        return;
-      }
-
-      setResult(data.result);
+      setResult(result);
       toast.success("Generated successfully!");
-      
-    } catch (error) {
+
+    } catch (error: any) {
       console.error("Textbook assistant error:", error);
-      toast.error("Failed to connect to AI service");
+      toast.error(error.message || "Failed to connect to AI service");
     } finally {
       setLoading(false);
     }
@@ -87,7 +75,7 @@ export default function TextbookLearningAssistant({ open, onOpenChange }: Textbo
 
   const handleDownload = () => {
     if (!result) return;
-    
+
     const blob = new Blob([result], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -194,8 +182,8 @@ export default function TextbookLearningAssistant({ open, onOpenChange }: Textbo
                   showLabel={true}
                 />
 
-                <Button 
-                  onClick={handleGenerate} 
+                <Button
+                  onClick={handleGenerate}
                   disabled={loading || !textbookContent.trim()}
                   className="w-full"
                 >

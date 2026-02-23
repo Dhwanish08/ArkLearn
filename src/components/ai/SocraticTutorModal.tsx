@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, MessageCircle, Sparkles, BookOpen, Upload } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSelector, { SUPPORTED_LANGUAGES } from "./LanguageSelector";
+import { callSocraticTutor } from "@/lib/ai-service";
 
 interface SocraticTutorModalProps {
   open: boolean;
@@ -131,30 +132,15 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
     setConversationHistory(newHistory);
 
     try {
-      const res = await fetch("/api/ai/socratic-tutor", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question: studentMessage,
-          subject,
-          grade,
-          chapter: selectedChapter,
-          textbookContext,
-          language: selectedLanguage,
-          conversationHistory: newHistory.slice(-4), // Send last 4 messages for context
-        }),
+      const tutorMessage = await callSocraticTutor({
+        question: studentMessage,
+        subject,
+        grade,
+        chapter: selectedChapter,
+        textbookContext,
+        language: selectedLanguage,
+        conversationHistory: newHistory.slice(-4), // Send last 4 messages for context
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Failed to get response");
-        return;
-      }
-
-      const tutorMessage = data.response;
 
       // Add tutor response to conversation
       setConversationHistory([...newHistory, { type: 'tutor' as const, message: tutorMessage }]);
@@ -162,9 +148,9 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
 
       toast.success("Got your Socratic guidance!");
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Socratic tutor error:", error);
-      toast.error("Failed to connect to AI service");
+      toast.error(error.message || "Failed to connect to AI service");
     } finally {
       setLoading(false);
     }
@@ -348,8 +334,8 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                   >
                     <div
                       className={`max-w-[80%] p-3 rounded-lg ${message.type === 'student'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white border border-gray-200'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white border border-gray-200'
                         }`}
                     >
                       <div className="text-sm">
