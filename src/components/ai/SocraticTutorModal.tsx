@@ -32,7 +32,7 @@ const SUBJECTS = [
 
 const GRADES = [
   "Elementary School",
-  "Middle School", 
+  "Middle School",
   "High School",
   "College"
 ];
@@ -112,12 +112,12 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
   const [textbookContext, setTextbookContext] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [loading, setLoading] = useState(false);
-  const [conversationHistory, setConversationHistory] = useState<Array<{type: 'student' | 'tutor', message: string}>>([]);
+  const [conversationHistory, setConversationHistory] = useState<Array<{ type: 'student' | 'tutor', message: string }>>([]);
   const [isConversationMode, setIsConversationMode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!question.trim()) {
       toast.error("Please enter your question");
       return;
@@ -155,13 +155,13 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
       }
 
       const tutorMessage = data.response;
-      
+
       // Add tutor response to conversation
       setConversationHistory([...newHistory, { type: 'tutor' as const, message: tutorMessage }]);
       setIsConversationMode(true);
-      
+
       toast.success("Got your Socratic guidance!");
-      
+
     } catch (error) {
       console.error("Socratic tutor error:", error);
       toast.error("Failed to connect to AI service");
@@ -251,7 +251,7 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                     <SelectValue placeholder="Select chapter (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No specific chapter</SelectItem>
+                    <SelectItem value="none">No specific chapter</SelectItem>
                     {TEXTBOOK_CHAPTERS[subject as keyof typeof TEXTBOOK_CHAPTERS]?.map((chapter) => (
                       <SelectItem key={chapter} value={chapter}>
                         {chapter}
@@ -321,7 +321,7 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                   </>
                 )}
               </Button>
-              
+
               {conversationHistory.length > 0 && (
                 <Button type="button" variant="outline" onClick={handleReset}>
                   Start New Conversation
@@ -338,7 +338,7 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                 <MessageCircle className="w-4 h-4 text-blue-500" />
                 <h3 className="font-semibold">Conversation</h3>
               </div>
-              
+
               {/* Chat Messages */}
               <div className="max-h-96 overflow-y-auto space-y-3 p-4 bg-gray-50 rounded-lg">
                 {conversationHistory.map((message, index) => (
@@ -347,11 +347,10 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                     className={`flex ${message.type === 'student' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        message.type === 'student'
+                      className={`max-w-[80%] p-3 rounded-lg ${message.type === 'student'
                           ? 'bg-blue-500 text-white'
                           : 'bg-white border border-gray-200'
-                      }`}
+                        }`}
                     >
                       <div className="text-sm">
                         {message.message.split('\n').map((line, lineIndex) => (
@@ -363,7 +362,7 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
                     </div>
                   </div>
                 ))}
-                
+
                 {loading && (
                   <div className="flex justify-start">
                     <div className="bg-white border border-gray-200 p-3 rounded-lg">
@@ -377,7 +376,7 @@ export default function SocraticTutorModal({ open, onOpenChange }: SocraticTutor
               </div>
 
               <div className="text-xs text-muted-foreground bg-green-50 p-3 rounded-lg border border-green-200">
-                <strong>💡 Tip:</strong> This is a conversational tutor! Feel free to ask follow-up questions or ask for clarification. 
+                <strong>💡 Tip:</strong> This is a conversational tutor! Feel free to ask follow-up questions or ask for clarification.
                 The tutor will guide you step by step to discover answers yourself. {selectedChapter && `Currently focused on: ${selectedChapter}`}
               </div>
             </div>
