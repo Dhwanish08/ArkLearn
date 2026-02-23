@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+# ArkLearn: Smart Class Command Platform
 
-## Project info
+ArkLearn is a modern, AI-powered educational platform designed to enhance the learning experience for students, teachers, and administrators. It integrates curricula-aligned AI tools, comprehensive dashboard management, and interactive learning modules.
 
-**URL**: https://lovable.dev/projects/79033270-e359-4219-88e3-59bd4748175d
+## 🚀 Key Features
 
-## How can I edit this code?
+### 🤖 AI-Powered Learning
+- **Textbook Learning Assistant**: Analyze textbook chapters to generate summaries, key points, practice questions, and flashcards.
+- **Socratic Tutor**: A context-aware AI tutor that guides students through concepts using their own textbook content.
+- **Multi-language Support**: Study in English, Gujarati, Hindi, or Sanskrit.
 
-There are several ways of editing your application.
+### 📋 Administrative & Management
+- **Universal Dashboard**: Tailored experiences for Students, Teachers, and Administrators.
+- **Timetable Management**: Efficient scheduling and CSV-based timetable uploads.
+- **User Management**: Comprehensive role-based access control and user profile management.
+- **Leaderboards**: Gamified learning with student performance tracking.
 
-**Use Lovable**
+## 🛠️ Tech Stack
+- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
+- **Backend/Cloud**: Firebase (Authentication, Firestore, Cloud Functions).
+- **AI Integration**: Google Gemini AI (via Cloud Functions and direct API integration).
+- **Icons & UI**: Lucide React, Recharts.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/79033270-e359-4219-88e3-59bd4748175d) and start prompting.
+## 📦 Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
+- Node.js & npm/bun installed.
+- A Firebase project and Google Gemini API key.
 
-**Use your preferred IDE**
+### Installation
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/Dhwanish08/ArkLearn.git
+   cd ArkLearn
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Set up environment variables:
+   Create a `.env` file in the root directory and add your Firebase and Gemini credentials:
+   ```env
+   VITE_FIREBASE_API_KEY=your_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_GEMINI_API_KEY=your_gemini_key
+   ... (see .env.example)
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+### Development
+Start the development server:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📖 Deployment
+The project is configured for deployment on Vercel and Firebase.
+- **Vercel**: `npm run build` generates the `dist` folder.
+- **Firebase Functions**: `npm run --prefix functions deploy`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🛡️ License
+Private project. All rights reserved.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/79033270-e359-4219-88e3-59bd4748175d) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+*Built with ❤️ for Smarter Learning.*
