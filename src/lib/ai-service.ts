@@ -105,57 +105,66 @@ export async function callTextbookAssistant(request: TextbookRequest) {
  * Directly call Gemini API from the browser
  */
 async function callGeminiDirect(prompt: string, temperature: number, maxTokens: number) {
-    // Try multiple model identifiers in case one is not available or restricted
+    // Try multiple model identifiers and API versions
     const models = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    const apiVersions = ["v1", "v1beta"];
     let lastError: any = null;
 
     for (const model of models) {
-        try {
-            console.log(`Attempting Gemini call with model: ${model}...`);
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature,
-                            topK: 40,
-                            topP: 0.95,
-                            maxOutputTokens: maxTokens,
-                        },
-                    }),
+        for (const version of apiVersions) {
+            try {
+                console.log(`Attempting Gemini call with version: ${version}, model: ${model}...`);
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                temperature,
+                                topK: 40,
+                                topP: 0.95,
+                                maxOutputTokens: maxTokens,
+                            },
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    const errorMessage = errorData.error?.message || response.statusText;
+
+                    // Specific ignore for 404 (model/version not found) or 400 (bad version for model)
+                    if (response.status === 404 || response.status === 400) {
+                        console.warn(`Gemini [${version}] ${model} not available:`, errorMessage);
+                        continue;
+                    }
+
+                    console.warn(`Gemini [${version}] ${model} failed:`, errorMessage);
+
+                    // If it's an API key error, don't keep trying other models
+                    if (response.status === 401 || (response.status === 400 && errorMessage.toLowerCase().includes("key"))) {
+                        throw new Error(`Invalid API Key or Key blocked: ${errorMessage}`);
+                    }
+
+                    lastError = new Error(`Gemini [${version}] ${model} error: ${errorMessage}`);
+                    continue;
                 }
-            );
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.error?.message || response.statusText;
-                console.warn(`Gemini ${model} failed:`, errorMessage);
-
-                // If it's an API key error, don't keep trying other models
-                if (response.status === 400 && errorMessage.toLowerCase().includes("key")) {
-                    throw new Error(`Invalid API Key: ${errorMessage}`);
+                const data = await response.json();
+                if (!data.candidates || data.candidates.length === 0) {
+                    console.warn(`Gemini [${version}] ${model} returned no candidates`);
+                    continue;
                 }
 
-                lastError = new Error(`Gemini ${model} error: ${errorMessage}`);
-                continue; // Try next model
+                console.log(`Gemini [${version}] ${model} call successful!`);
+                return data.candidates[0].content.parts[0].text;
+            } catch (error: any) {
+                if (error.message.includes("API Key")) throw error;
+                console.error(`Error with [${version}] model ${model}:`, error.message);
+                lastError = error;
             }
-
-            const data = await response.json();
-            if (!data.candidates || data.candidates.length === 0) {
-                console.warn(`Gemini ${model} returned no candidates`);
-                continue;
-            }
-
-            console.log(`Gemini ${model} call successful!`);
-            return data.candidates[0].content.parts[0].text;
-        } catch (error: any) {
-            console.error(`Error with model ${model}:`, error.message);
-            lastError = error;
-            // If it's a critical error (like invalid key), stop the loop
-            if (error.message.includes("API Key")) throw error;
         }
     }
 
