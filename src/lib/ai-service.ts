@@ -105,35 +105,61 @@ export async function callTextbookAssistant(request: TextbookRequest) {
  * Directly call Gemini API from the browser
  */
 async function callGeminiDirect(prompt: string, temperature: number, maxTokens: number) {
-    const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: maxTokens,
-                },
-            }),
+    // Try multiple model identifiers in case one is not available or restricted
+    const models = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    let lastError: any = null;
+
+    for (const model of models) {
+        try {
+            console.log(`Attempting Gemini call with model: ${model}...`);
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: maxTokens,
+                        },
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error?.message || response.statusText;
+                console.warn(`Gemini ${model} failed:`, errorMessage);
+
+                // If it's an API key error, don't keep trying other models
+                if (response.status === 400 && errorMessage.toLowerCase().includes("key")) {
+                    throw new Error(`Invalid API Key: ${errorMessage}`);
+                }
+
+                lastError = new Error(`Gemini ${model} error: ${errorMessage}`);
+                continue; // Try next model
+            }
+
+            const data = await response.json();
+            if (!data.candidates || data.candidates.length === 0) {
+                console.warn(`Gemini ${model} returned no candidates`);
+                continue;
+            }
+
+            console.log(`Gemini ${model} call successful!`);
+            return data.candidates[0].content.parts[0].text;
+        } catch (error: any) {
+            console.error(`Error with model ${model}:`, error.message);
+            lastError = error;
+            // If it's a critical error (like invalid key), stop the loop
+            if (error.message.includes("API Key")) throw error;
         }
-    );
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Gemini API Error:", errorText);
-        throw new Error("Gemini API request failed");
     }
 
-    const data = await response.json();
-    if (!data.candidates || data.candidates.length === 0) {
-        throw new Error("No response from AI service");
-    }
-
-    return data.candidates[0].content.parts[0].text;
+    throw lastError || new Error("All Gemini model attempts failed. Please check your API key and internet connection.");
 }
 
 /**
