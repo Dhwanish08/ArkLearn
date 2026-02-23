@@ -29,14 +29,17 @@ const IS_DEV = import.meta.env.DEV;
  * Call the Socratic Tutor AI
  */
 export async function callSocraticTutor(request: SocraticRequest) {
-    // If we are in DEV mode and have an API key, call Gemini directly
-    if (IS_DEV && GEMINI_API_KEY) {
+    // If we are in DEV mode
+    if (IS_DEV) {
+        if (!GEMINI_API_KEY) {
+            throw new Error("Missing Gemini API Key. Please add VITE_GEMINI_API_KEY to your .env file and restart the dev server.");
+        }
         try {
             const prompt = createSocraticPrompt(request);
             return await callGeminiDirect(prompt, 0.7, 800);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Direct Gemini call failed:", error);
-            throw new Error("Failed to connect to AI service (Direct)");
+            throw new Error(error.message || "Failed to connect to AI service (Direct)");
         }
     }
 
@@ -48,8 +51,12 @@ export async function callSocraticTutor(request: SocraticRequest) {
     });
 
     if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to get response from AI service");
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            throw new Error(data.error || "Failed to get response from AI service");
+        }
+        throw new Error(`AI service error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -60,14 +67,17 @@ export async function callSocraticTutor(request: SocraticRequest) {
  * Call the Textbook Assistant AI
  */
 export async function callTextbookAssistant(request: TextbookRequest) {
-    // If we are in DEV mode and have an API key, call Gemini directly
-    if (IS_DEV && GEMINI_API_KEY) {
+    // If we are in DEV mode
+    if (IS_DEV) {
+        if (!GEMINI_API_KEY) {
+            throw new Error("Missing Gemini API Key. Please add VITE_GEMINI_API_KEY to your .env file and restart the dev server.");
+        }
         try {
             const prompt = createTextbookPrompt(request);
             return await callGeminiDirect(prompt, 0.3, 2000);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Direct Gemini call failed:", error);
-            throw new Error("Failed to connect to AI service (Direct)");
+            throw new Error(error.message || "Failed to connect to AI service (Direct)");
         }
     }
 
@@ -79,8 +89,12 @@ export async function callTextbookAssistant(request: TextbookRequest) {
     });
 
     if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to generate content");
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            throw new Error(data.error || "Failed to generate content");
+        }
+        throw new Error(`AI service error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
